@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Kisan Manager</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1f6b3a">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- LOGIN PAGE -->
+  <div id="bootScreen" class="boot-screen">
+    <img src="icons/icon-192.png" alt="Kisan Manager Logo">
+    <h1>Kisan Manager</h1>
+    <p>Opening your farm records...</p>
+  </div>
+
+  <div id="loginPage" class="login-page hidden">
+    <div class="login-card">
+
+      <div class="login-logo">
+        <img src="icons/icon-192.png" alt="Kisan Manager Logo" class="login-logo-img">
+        <h1>Kisan Manager</h1>
+        <p>Farm, Tractor & Labour Records</p>
+      </div>
+
+      <div class="login-tabs">
+        <button id="loginTabBtn" class="active-login-tab" onclick="showLoginForm()">Login</button>
+        <button id="signupTabBtn" onclick="showSignupForm()">Create</button>
+      </div>
+
+      <div id="loginFormBox">
+        <h2>Login</h2>
+
+        <label>Email</label>
+        <input type="email" id="loginEmail" autocomplete="email">
+
+        <label>Password</label>
+        <div class="password-box">
+          <input type="password" id="loginPassword" autocomplete="current-password">
+          <button type="button" class="password-toggle" onclick="togglePassword('loginPassword', this)">Show</button>
+        </div>
+
+        <button onclick="loginUser()">Login</button>
+      </div>
+
+      <div id="signupFormBox" class="hidden">
+        <h2>Create Account</h2>
+
+        <label>Account Name</label>
+        <input type="text" id="signupName">
+
+        <label>Email</label>
+        <input type="email" id="signupEmail" autocomplete="email">
+
+        <label>Password</label>
+        <div class="password-box">
+          <input type="password" id="signupPassword" autocomplete="new-password">
+          <button type="button" class="password-toggle" onclick="togglePassword('signupPassword', this)">Show</button>
+        </div>
+
+        <button onclick="createUserAccount()">Create Account</button>
+      </div>
+
+      <div id="authMessage" class="auth-message hidden"></div>
+
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="mainApp" class="hidden">
+    <header>
+      <div class="top-header">
+
+        <div class="app-brand">
+          <div class="app-logo-img-box"><img src="icons/icon-192.png" alt="Kisan Manager Logo"></div>
+
+          <div class="app-title-box">
+            <h1>Kisan Manager</h1>
+            <p id="headerText">Tractor Work & Payment Record</p>
+          </div>
+        </div>
+
+        <div class="profile-wrapper">
+          <button class="profile-avatar" onclick="toggleProfileMenu(event)" aria-label="Account Menu">
+            <span id="profileInitial">K</span>
+          </button>
+          <div id="profileMenu" class="profile-dropdown hidden">
+            <div class="profile-dropdown-header">
+              <div class="profile-dropdown-avatar">
+                <span id="profileInitialLarge">K</span>
+              </div>
+              <div class="profile-dropdown-info">
+                <p id="accountName">Farm Account</p>
+                <small id="accountEmail">Logged in</small>
+              </div>
+            </div>
+            <div class="profile-dropdown-actions">
+              <button class="logout-btn" onclick="logoutUser()">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <div class="container">
+
+      <div class="mode-switch">
+        <button id="tractorModeBtn" class="active-mode tractor-main-btn" onclick="setMode('tractor')">Tractor</button>
+
+        <div class="crop-mode-row">
+          <button id="mirchiModeBtn" onclick="setMode('mirchi')">Mirchii</button>
+          <button id="cottonModeBtn" onclick="setMode('cotton')">Cotton</button>
+        </div>
+      </div>
+
+      <div id="homePage">
+
+        <div id="tractorHome">
+          <div class="section">
+            <h2>Search Customer</h2>
+
+            <div class="search-box inside-search">
+              <input type="text" id="searchInput" oninput="showCustomerSuggestions()">
+              <button onclick="searchCustomer()">Search</button>
+            </div>
+
+            <div id="customerSuggestions"></div>
+            <div id="searchResult"></div>
+          </div>
+
+          <div class="section">
+            <h2>All Tractor Customers</h2>
+            <div id="allCustomers"></div>
+          </div>
+        </div>
+
+        <div id="cropHome" class="hidden">
+          <div class="section">
+            <h2 id="cropSearchTitle">Search Mirchii Date / Labour</h2>
+
+            <div class="search-box inside-search">
+              <input type="text" id="cropSearchInput">
+              <button onclick="searchCrop()">Search</button>
+            </div>
+
+            <div id="cropSearchResult"></div>
+          </div>
+
+          <div class="section">
+            <h2 id="cropListTitle">Day Wise Mirchii Weight</h2>
+            <div id="allCropDays"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="addPage" class="hidden">
+
+        <div id="tractorAdd">
+          <div class="section">
+            <h2>Add Tractor Work</h2>
+
+            <label>First Name</label>
+            <input type="text" id="firstName">
+
+            <label>Last Name</label>
+            <input type="text" id="lastName">
+
+            <label>Phone Number</label>
+            <input type="text" inputmode="numeric" id="phoneNumber">
+
+            <label>Field Name</label>
+            <input type="text" id="fieldName">
+
+            <label>Tool Used</label>
+            <select id="toolUsed" onchange="handleToolChange()">
+              <option value="">Select Tool</option>
+              <option value="3-Nagger">3-Nagger</option>
+              <option value="2-Nagger">2-Nagger</option>
+              <option value="Rotavator">Rotavator</option>
+              <option value="Panjhi">Panjhi</option>
+              <option value="V-Phas">V-Phas</option>
+              <option value="Seed Drill">Seed Drill</option>
+              <option value="Trolly">Trolly</option>
+              <option value="Thresher">Thresher</option>
+            </select>
+
+            <div id="cropBox" class="hidden">
+              <label>Crop Type</label>
+              <select id="cropType">
+                <option value="">Select Crop</option>
+                <option value="Soyya">Soyya</option>
+                <option value="Chena">Chena</option>
+                <option value="Mong">Mong</option>
+                <option value="Javarri">Javarri</option>
+                <option value="Gavoo">Gavoo</option>
+                <option value="Thoor">Thoor</option>
+              </select>
+            </div>
+
+            <label id="quantityLabel">Quantity</label>
+            <input type="text" inputmode="decimal" id="quantity" oninput="calculateTotal()">
+
+            <label id="rateLabel">Rate</label>
+            <input type="text" inputmode="decimal" id="rate" oninput="calculateTotal()">
+
+            <label>Total Amount</label>
+            <input type="text" id="total" readonly>
+
+            <label>Date</label>
+            <input type="text" inputmode="numeric" id="workDate" class="date-input" maxlength="10">
+
+            <label>Work Note</label>
+            <textarea id="workNote"></textarea>
+
+            <button onclick="saveWork()">Save Tractor Work</button>
+          </div>
+        </div>
+
+        <div id="cropAdd" class="hidden">
+          <div class="section">
+            <h2 id="cropAddTitle">Create Mirchii Day Record</h2>
+
+            <label>Date</label>
+            <input type="text" inputmode="numeric" id="cropDate" class="date-input" maxlength="10" onblur="setCropDayName()">
+
+            <label>Day</label>
+            <input type="text" id="cropDayName" readonly>
+
+            <label>Small Day Note</label>
+            <textarea id="cropDayNote"></textarea>
+
+            <button onclick="saveCropDay()">Create Day Card</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="reportPage" class="hidden">
+        <div class="section">
+          <h2 id="reportTitle">Tractor Report</h2>
+          <div id="reportBox"></div>
+
+          <div class="actions two-col danger-zone">
+            <button class="add-pay-btn" onclick="syncNow()">Sync Now</button>
+            <button class="edit-btn" onclick="restoreFromCloud()">Restore Cloud</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="bottom-nav">
+      <button id="homeBtn" class="active" onclick="showPage('homePage', 'homeBtn')">Home</button>
+      <button id="addBtn" onclick="showPage('addPage', 'addBtn')">Add</button>
+      <button id="reportBtn" onclick="showPage('reportPage', 'reportBtn')">Report</button>
+    </div>
+
+  </div>
+
+  <div id="toastMessage" class="toast hidden"></div>
+
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <script type="module" src="firebase-auth.js"></script>
+  <script type="module" src="firebase-sync.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function() {
+        navigator.serviceWorker.register("service-worker.js")
+          .then(function() {
+            console.log("Offline app ready");
+          })
+          .catch(function(error) {
+            console.log("Service worker error:", error);
+          });
+      });
+    }
+  </script>
+
+</body>
+</html>
